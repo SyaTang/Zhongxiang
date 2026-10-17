@@ -187,6 +187,25 @@
     <div id="caseList"></div>
   </section>
 
+  <!-- ================= SYNC (export/import) ================= -->
+  <div class="card" id="syncCard">
+    <h3 style="margin:0 0 6px;font-size:17px">进度同步 · 导出 / 导入存档码</h3>
+    <p class="muted">存档码把<b>选择题作答 + 剩余倒计时 + 案例草稿</b>打包成一段文本。在 A 设备点「生成存档码」并复制，到 B 设备粘贴后点「导入」即可接着刷。<br>建议每次做完题就生成一次存档码留存；交卷后的成绩与解析状态也会一并打包。</p>
+    <div class="rowbtns" style="margin-top:6px">
+      <button class="btn ghost" onclick="exportCode()">① 生成本机存档码</button>
+    </div>
+    <div id="exportOut" class="hidden" style="margin-top:12px">
+      <div class="muted" id="exportMeta" style="margin-bottom:6px"></div>
+      <textarea class="myans" id="exportText" readonly style="min-height:90px" onclick="this.select()"></textarea>
+      <div class="rowbtns"><button class="btn" onclick="copyCode()">复制存档码</button><span class="muted" id="copyHint"></span></div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="muted" style="margin-bottom:6px">把在别的设备生成的存档码粘贴到这里：</div>
+      <textarea class="myans" id="importText" placeholder="粘贴存档码（以 ZX1. 开头的一长串文本）" style="min-height:80px"></textarea>
+      <div class="rowbtns"><button class="btn" onclick="importCode()">② 导入并覆盖本机进度</button></div>
+    </div>
+  </div>
+
   <div class="footnote">
     依据「25.11 中项密押模拟卷全套 2（习题版 / 答案版）」整理生成 · 仅供个人备考使用<br>
     选择题答案与解析来自答案版 OCR，题面文字已作规范化整理；如与原文疑义请以 PDF 原卷为准。
@@ -401,6 +420,67 @@ function toggleRef(btn,idx){
   btn.textContent = show?'隐藏参考答案':'显示参考答案';
 }
 function saveCaseNote(idx,v){ const m=load(KC)||{}; m[idx]=v; save(KC,m); }
+
+// ---- sync: export / import save code ----
+function b64enc(str){ const bytes=new TextEncoder().encode(str); let bin=''; for(let i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]); return btoa(bin); }
+function b64dec(b64){ const bin=atob(b64); const bytes=Uint8Array.from(bin, c=>c.charCodeAt(0)); return new TextDecoder().decode(bytes); }
+
+function snapshot(){ return { v:1, ts:Date.now(), exam:S, cases:(load(KC)||{}) }; }
+
+function exportCode(){
+  try{
+    const code = 'ZX1.' + b64enc(JSON.stringify(snapshot()));
+    const t=document.getElementById('exportText');
+    t.value = code;
+    const done=Object.keys(S.answers||{}).length;
+    const casesN=Object.keys(load(KC)||{}).length;
+    const modeTxt = S.mode==='result' ? '已交卷' : (S.mode==='taking' ? '答题中' : '未开始');
+    document.getElementById('exportMeta').textContent =
+      '存档内容：选择题已答 '+done+' / '+TOTAL+' · 剩余时间 '+fmt(S.remaining)+' · 状态 '+modeTxt+' · 案例草稿 '+casesN+' 条';
+    document.getElementById('exportOut').classList.remove('hidden');
+    document.getElementById('copyHint').textContent='';
+    t.select();
+  }catch(e){ alert('生成存档码失败：'+e.message); }
+}
+
+function copyCode(){
+  const t=document.getElementById('exportText');
+  const hint=document.getElementById('copyHint');
+  t.removeAttribute('readonly'); t.focus(); t.select(); t.setSelectionRange(0,t.value.length);
+  let ok=false;
+  try{ ok=document.execCommand('copy'); }catch(e){}
+  t.setAttribute('readonly','');
+  if(ok){ hint.textContent='已复制到剪贴板 ✓'; return; }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t.value).then(()=>{ hint.textContent='已复制到剪贴板 ✓'; })
+      .catch(()=>{ hint.textContent='自动复制失败，请长按/右键全选文本框内容后手动复制'; });
+    return;
+  }
+  hint.textContent='自动复制失败，请长按/右键全选文本框内容后手动复制';
+}
+
+function importCode(){
+  let raw=(document.getElementById('importText').value||'').trim();
+  if(!raw){ alert('请先粘贴存档码'); return; }
+  raw=raw.replace(/\s+/g,'');
+  let payload=raw;
+  if(payload.indexOf('ZX1.')===0) payload=payload.slice(4);
+  else if(payload.indexOf('ZX1')===0) payload=payload.replace(/^ZX1\.?/,'');
+  let snap;
+  try{ snap=JSON.parse(b64dec(payload)); }
+  catch(e){ alert('存档码无法识别，可能粘贴不完整或已被截断。请回到原设备重新复制完整内容再试。'); return; }
+  if(!snap || snap.v!==1 || !snap.exam || typeof snap.exam!=='object' || !snap.exam.answers){
+    alert('存档码格式不正确或版本不匹配，已取消导入。'); return;
+  }
+  if(!confirm('导入将覆盖本机当前进度（选择题作答、剩余倒计时、案例草稿）。确定继续？')) return;
+  const ex=snap.exam;
+  ex.answers = ex.answers||{};
+  ex.cur = (typeof ex.cur==='number' && ex.cur>=0 && ex.cur<TOTAL) ? ex.cur : 0;
+  ex.remaining = (typeof ex.remaining==='number') ? ex.remaining : DURATION;
+  ex.mode = (['idle','taking','result'].indexOf(ex.mode)>=0) ? ex.mode : 'idle';
+  save(K, ex); save(KC, snap.cases||{});
+  location.reload();
+}
 
 // ---- boot ----
 window.addEventListener('beforeunload',()=>{ if(tickId) save(K,S); });
