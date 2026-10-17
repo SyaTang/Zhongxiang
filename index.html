@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中项（系统集成项目管理工程师）· 25.11 密押模拟卷 刷题系统</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#1f2430; --sub:#6b7280; --line:#e6e9f2;
+    --brand:#3b5bdb; --brand2:#4c6ef5; --ok:#0ca678; --okbg:#e6f7f1;
+    --bad:#e03131; --badbg:#fdecec; --warn:#f08c00; --warnbg:#fff4e6;
+    --shadow:0 8px 30px rgba(31,41,85,.08); --shadow2:0 2px 8px rgba(31,41,85,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Heiti SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:20px 18px 60px}
+  header.top{background:linear-gradient(135deg,#3b5bdb,#5f3dc4);color:#fff;border-radius:16px;
+    padding:22px 24px;box-shadow:var(--shadow);margin-bottom:18px}
+  header.top h1{margin:0 0 6px;font-size:22px;letter-spacing:.5px}
+  header.top p{margin:0;opacity:.9;font-size:13.5px}
+  .tabs{display:flex;gap:8px;margin:0 0 18px;flex-wrap:wrap}
+  .tab{flex:1;min-width:150px;text-align:center;padding:12px;border-radius:12px;background:var(--card);
+    border:1px solid var(--line);cursor:pointer;font-weight:600;color:var(--sub);box-shadow:var(--shadow2);transition:.15s}
+  .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:24px;margin-bottom:16px;border:1px solid var(--line)}
+  .muted{color:var(--sub);font-size:13.5px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;
+    padding:11px 20px;border-radius:11px;font-size:15px;font-weight:600;transition:.15s;background:var(--brand);color:#fff}
+  .btn:hover{background:var(--brand2)}
+  .btn.ghost{background:#eef1fb;color:var(--brand)}
+  .btn.ghost:hover{background:#e3e8fa}
+  .btn.line{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.line:hover{background:#f6f7fb}
+  .btn.big{padding:14px 30px;font-size:17px}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .rules{list-style:none;padding:0;margin:14px 0 0}
+  .rules li{padding:8px 0 8px 26px;position:relative;color:#374151}
+  .rules li::before{content:"";position:absolute;left:4px;top:14px;width:10px;height:10px;border-radius:3px;background:var(--brand2)}
+  /* exam bar */
+  .exambar{position:sticky;top:0;z-index:20;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;box-shadow:var(--shadow2);padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .timer{font-variant-numeric:tabular-nums;font-weight:800;font-size:22px;letter-spacing:1px;color:var(--brand)}
+  .timer.low{color:var(--bad)}
+  .timer .lbl{font-size:12px;font-weight:600;color:var(--sub);margin-right:6px;letter-spacing:0}
+  .bar-progress{flex:1;min-width:140px;height:9px;background:#eef0f7;border-radius:9px;overflow:hidden}
+  .bar-progress>i{display:block;height:100%;background:linear-gradient(90deg,#4c6ef5,#0ca678);width:0%}
+  /* palette */
+  .palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:8px;margin-top:6px}
+  .cell{aspect-ratio:1/1;border-radius:9px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:600;color:var(--sub);cursor:pointer;transition:.12s}
+  .cell:hover{border-color:var(--brand2)}
+  .cell.done{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .cell.cur{outline:3px solid #bac8ff;outline-offset:-1px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--sub);margin-top:10px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:13px;height:13px;border-radius:4px;display:inline-block}
+  /* question */
+  .qnum{display:inline-block;background:#eef1fb;color:var(--brand);font-weight:700;border-radius:8px;padding:3px 11px;font-size:13.5px;margin-bottom:12px}
+  .stem{font-size:17px;line-height:1.85;margin:0 0 18px;white-space:pre-wrap}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer;background:#fff;transition:.12s;font-size:15.5px}
+  .opt:hover{border-color:#bac8ff;background:#f8faff}
+  .opt .key{flex:none;width:26px;height:26px;border-radius:8px;background:#eef1fb;color:var(--brand);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .opt .txt{padding-top:1px}
+  .opt.sel{border-color:var(--brand);background:#eef2ff}
+  .opt.sel .key{background:var(--brand);color:#fff}
+  .opt.correct{border-color:var(--ok);background:var(--okbg)}
+  .opt.correct .key{background:var(--ok);color:#fff}
+  .opt.wrong{border-color:var(--bad);background:var(--badbg)}
+  .opt.wrong .key{background:var(--bad);color:#fff}
+  .opt .tag{margin-left:auto;font-size:12px;font-weight:700;align-self:center;padding:2px 8px;border-radius:6px}
+  .tag.c{color:#fff;background:var(--ok)} .tag.w{color:#fff;background:var(--bad)}
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:10px;flex-wrap:wrap}
+  /* results */
+  .scorewrap{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+  .scorebig{font-size:56px;font-weight:800;color:var(--brand);line-height:1;font-variant-numeric:tabular-nums}
+  .scorebig small{font-size:22px;color:var(--sub);font-weight:600}
+  .passbadge{display:inline-block;padding:7px 16px;border-radius:99px;font-weight:700;font-size:15px}
+  .pass{background:var(--okbg);color:var(--ok)} .fail{background:var(--badbg);color:var(--bad)}
+  .statgrid{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .stat{flex:1;min-width:120px;background:#f7f9ff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .stat b{display:block;font-size:24px;font-variant-numeric:tabular-nums}
+  .stat.ok b{color:var(--ok)} .stat.bad b{color:var(--bad)} .stat.skip b{color:var(--warn)}
+  .review{border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;background:#fff}
+  .review .rh{display:flex;gap:10px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+  .badge{font-size:12px;font-weight:700;padding:2px 9px;border-radius:6px}
+  .badge.wrong{background:var(--badbg);color:var(--bad)} .badge.skip{background:var(--warnbg);color:var(--warn)} .badge.right{background:var(--okbg);color:var(--ok)}
+  .exp{margin-top:12px;padding:13px 15px;background:#f7f9ff;border-left:4px solid var(--brand2);border-radius:0 10px 10px 0;font-size:14.5px;color:#374151;white-space:pre-wrap}
+  .exp b{color:var(--brand)}
+  .exp .ansline{font-weight:700;color:var(--ok);margin-bottom:6px;display:block}
+  /* case */
+  details.case{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow2);margin-bottom:14px;overflow:hidden}
+  details.case>summary{list-style:none;cursor:pointer;padding:16px 20px;font-weight:700;font-size:16px;display:flex;align-items:center;gap:10px}
+  details.case>summary::-webkit-details-marker{display:none}
+  details.case>summary .cid{background:var(--brand);color:#fff;border-radius:8px;padding:2px 10px;font-size:13px}
+  details.case>summary .cscore{margin-left:auto;color:var(--sub);font-weight:600;font-size:13px}
+  details.case[open]>summary{border-bottom:1px solid var(--line);background:#f8faff}
+  .cbody{padding:18px 20px}
+  .cbody .bg{white-space:pre-wrap;color:#374151;font-size:15px;line-height:1.9}
+  .qs{margin:14px 0;padding:0;list-style:none}
+  .qs li{background:#f7f9ff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:8px;font-size:14.5px}
+  textarea.myans{width:100%;min-height:110px;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:14.5px;background:#fcfdff;resize:vertical;margin-top:6px}
+  .refblock{margin-top:12px;padding:16px;background:#f4fff9;border:1px solid #b7ebd6;border-radius:12px;white-space:pre-wrap;font-size:14.8px;color:#1b4d3a;line-height:1.85;display:none}
+  .refblock.show{display:block}
+  .rowbtns{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+  .hidden{display:none!important}
+  .footnote{font-size:12.5px;color:var(--sub);text-align:center;margin-top:24px;line-height:1.9}
+  @media(max-width:560px){.scorebig{font-size:44px}header.top h1{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>25.11 中项密押模拟卷 2 · 刷题系统</h1>
+    <p>信息系统集成项目管理工程师（系统集成项目管理工程师）· 综合知识 75 题 + 案例分析 4 题</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="exam" onclick="switchTab('exam')">选择题模拟考试</div>
+    <div class="tab" data-tab="case" onclick="switchTab('case')">案例分析 · 对照自评</div>
+  </div>
+
+  <!-- ================= EXAM TAB ================= -->
+  <section id="tab-exam">
+    <!-- start -->
+    <div class="card" id="startCard">
+      <h2 style="margin:0 0 6px">选择题考试（综合知识）</h2>
+      <p class="muted">本卷共 <b>75 道单项选择题</b>，考试时长 <b>120 分钟</b>（提速训练节奏，约每题 1.6 分钟）。<br>考试过程中不显示对错；<b>交卷后</b>统一核对评分，并对错题与未答题提供逐题解析。</p>
+      <ul class="rules">
+        <li>倒计时结束将<b>自动交卷</b>；也可随时手动交卷。</li>
+        <li>参考答案按 <b>45 分</b>（满分 75）为及格线。</li>
+        <li>答题进度自动保存在本机浏览器，关闭页面不丢失；交卷后可重新作答。</li>
+      </ul>
+      <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn big" onclick="startExam()">开始考试</button>
+        <button class="btn line hidden" id="resumeBtn" onclick="resumeExam()">继续上次作答</button>
+      </div>
+    </div>
+
+    <!-- taking -->
+    <div id="examArea" class="hidden">
+      <div class="exambar">
+        <div class="timer" id="timer"><span class="lbl">剩余</span><span id="clock">120:00</span></div>
+        <div class="bar-progress"><i id="pbar"></i></div>
+        <div class="muted" id="answerCount">已答 0 / 75</div>
+        <button class="btn" onclick="trySubmit()">交卷</button>
+      </div>
+
+      <div class="card">
+        <div id="qBox"></div>
+        <div class="nav">
+          <button class="btn ghost" onclick="go(-1)">上一题</button>
+          <div class="muted" id="posText"></div>
+          <button class="btn ghost" onclick="go(1)">下一题</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <h3 style="margin:0;font-size:16px">答题卡</h3>
+          <button class="btn ghost" onclick="togglePalette()" id="palBtn">收起</button>
+        </div>
+        <div id="palWrap">
+          <div class="palette" id="palette"></div>
+          <div class="legend">
+            <span><i class="dot" style="background:#fff;border:1px solid var(--line)"></i>未答</span>
+            <span><i class="dot" style="background:var(--brand)"></i>已答</span>
+            <span><i class="dot" style="background:#fff;border:2px solid #bac8ff"></i>当前题</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- results -->
+    <div id="resultArea" class="hidden"></div>
+  </section>
+
+  <!-- ================= CASE TAB ================= -->
+  <section id="tab-case" class="hidden">
+    <div class="card">
+      <h2 style="margin:0 0 6px">案例分析（下午科目 · 4 题共 75 分）</h2>
+      <p class="muted">案例分析为主观书面作答，无法自动判分。可先自行作答（草稿保存在本机），再展开<b>参考答案</b>逐条对照自评。案例中 WBS / RACI 表格的图示细节请以原 PDF 为准。</p>
+    </div>
+    <div id="caseList"></div>
+  </section>
+
+  <div class="footnote">
+    依据「25.11 中项密押模拟卷全套 2（习题版 / 答案版）」整理生成 · 仅供个人备考使用<br>
+    选择题答案与解析来自答案版 OCR，题面文字已作规范化整理；如与原文疑义请以 PDF 原卷为准。
+  </div>
+</div>
+
+<script>
+const DATA = {"mcq": [{"id": 1, "stem": "关于信息系统生命周期的描述，不正确的是（）。", "options": {"A": "信息系统的产生、建设、运行、维护、完善构成一个循环的过程，并有一定的规律可循", "B": "信息系统建设和维护随着各种环境变化，需要不断维护和修改，必要时可由新系统替代", "C": "信息系统的生命周期可简化为系统规划、系统分析、系统设计、系统运行和维护等阶段", "D": "信息系统建设周期长、投资大、用户习惯难以改变，定制化开发后无法进行重建和升级"}, "ans": "C", "exp": "信息系统的生命周期可以简化为：系统规划（可行性分析与项目开发计划）、系统分析（需求分析）、系统设计（概要设计、详细设计）、系统实施（编码、测试）、系统运行和维护等阶段。D 项“定制化开发后无法进行重建和升级”说法错误。"}, {"id": 2, "stem": "在信息传输模型中，（）属于编码器。", "options": {"A": "数模转换器", "B": "量化器", "C": "解调器", "D": "TCP/IP 网络"}, "ans": "B", "exp": "在信息传输模型中，A/C 属于解码器，D 属于信道，量化器（B）属于编码器。"}, {"id": 3, "stem": "GB/T 39116《智能制造能力成熟度模型》规定了企业智能制造能力在不同阶段应达到的水平。若企业能实现对核心业务活动的精准预测和优化，则该企业属于（）水平。", "options": {"A": "一级（规划级）", "B": "二级（规范级）", "C": "三级（集成级）", "D": "四级（优化级）"}, "ans": "D", "exp": "成熟度等级：一级（规划级）对核心业务活动进行流程化管理；二级（规范级）实现单一业务活动的数据共享；三级（集成级）实现跨业务活动间的数据共享；四级（优化级）对人员、资源、制造等进行数据挖掘，形成知识、模型等，实现对核心业务活动的精准预测和优化；五级（引领级）基于模型持续驱动业务优化和创新。"}, {"id": 4, "stem": "计算能力分散在许多设备中，设备具有足够处理能力执行所需服务，并根据数据和专用服务的需要连接中央服务器，属于（）。", "options": {"A": "集中式架构", "B": "分布式架构", "C": "企业信息化架构", "D": "面向服务的架构"}, "ans": "B", "exp": "分布式架构：运行业务所需的计算能力分散在许多设备中（服务器、PC、笔记本、智能手机、平板等）。设备（客户端）具有足够的处理能力执行所需服务，并根据数据和专用服务的需要连接中央服务器。"}, {"id": 5, "stem": "智慧城市的五个核心能力要素中，（）围绕对社会状态的本质反映及模拟预测等进行能力构建，洞察可变因素与不可见因素对社会发展的影响。", "options": {"A": "数字孪生", "B": "边际决策", "C": "多元融合", "D": "态势感知"}, "ans": "D", "exp": "态势感知：围绕对社会状态的本质反映及模拟预测等进行能力构建，洞察可变因素与不可见因素对社会发展的影响，从而提升生活质量。"}, {"id": 6, "stem": "（）不属于白盒测试方法。", "options": {"A": "静态测试", "B": "功能测试", "C": "人工检查代码逻辑", "D": "语句覆盖"}, "ans": "B", "exp": "白盒测试（结构测试）清楚程序内部结构，主要方法有控制流测试、数据流测试、程序变异测试；静态测试、人工检查代码逻辑、语句覆盖等逻辑覆盖技术均属白盒测试。黑盒测试也称功能测试，主要用于集成、确认和系统测试。故“功能测试”不属于白盒测试。"}, {"id": 7, "stem": "（）采用过程方法，全面管理基础设施、服务流程、人员和业务连续性，实现业务运营与 IT 服务运营融合。", "options": {"A": "部署实施", "B": "服务运营", "C": "持续改进", "D": "监督管理"}, "ans": "B", "exp": "服务运营采用过程方法，全面管理基础设施、服务流程、人员和业务连续性，实现业务运营与 IT 服务运营融合。"}, {"id": 8, "stem": "部署实施可分为（）四个阶段。", "options": {"A": "计划、启动、执行和交付", "B": "启动、计划、执行、监控、收尾", "C": "启动、计划、执行、收尾", "D": "启动、计划、执行和交付"}, "ans": "A", "exp": "部署实施可分为计划、启动、执行和交付四个阶段。"}, {"id": 9, "stem": "在常用的 OOD 原则中，（）原则是一个对象应当对其他对象有尽可能少的了解，该原则与结构化方法的（）原则是一致的。", "options": {"A": "单职高内聚", "B": "组合重用低耦合", "C": "迪米特低耦合", "D": "开闭高内聚"}, "ans": "C", "exp": "迪米特原则（最少知识法则）：一个对象应当对其他对象有尽可能少的了解，本原则与结构化方法的低耦合原则一致。"}, {"id": 10, "stem": "数据挖掘流程是（）。①数据准备；②确定分析对象；③数据挖掘；④结果评估；⑤结果应用", "options": {"A": "①②③⑤④", "B": "①②③④⑤", "C": "②①③⑤④", "D": "②①③④⑤"}, "ans": "D", "exp": "数据挖掘流程一般包括确定分析对象、数据准备、数据挖掘、结果评估与结果应用五个阶段，即②①③④⑤。"}, {"id": 11, "stem": "在应用集成中，有多个组件帮助协调连接各种应用。其中（）利用特定的数据结构，帮助开发人员快速访问其他应用的功能。", "options": {"A": "事件驱动型操作", "B": "API", "C": "数据映射", "D": "RNN"}, "ans": "B", "exp": "应用编程接口（API）定义不同软件交互的程序和规则，支持应用间相互通信；API 利用特定的数据结构，帮助开发人员快速访问其他应用功能。"}, {"id": 12, "stem": "信息系统体系架构总体参考框架由四个部分组成，即战略系统、业务系统、应用系统和信息基础设施。其中第三层是属于（）部分。", "options": {"A": "战略系统", "B": "业务系统", "C": "应用系统", "D": "信息基础设施"}, "ans": "D", "exp": "总体参考框架：第一层战略系统，第二层业务系统与应用系统，第三层信息基础设施。"}, {"id": 13, "stem": "在 J2EE 架构中，关于模型-视图-控制器模式（MVC），下列说法错误的是（）。", "options": {"A": "View 表示层指浏览器层，用于图形化展示请求结果", "B": "Controller 控制器指 Web 服务器层", "C": "Model 模型层指应用逻辑实现及数据持久化的部分", "D": "MVC 主要是要求视图与控制器的代码分开"}, "ans": "D", "exp": "MVC 主要是要求表示层（视图）与数据层（模型）的代码分开，而控制器用于连接不同的模型和视图完成用户需求。D 项“视图与控制器代码分开”表述错误。"}, {"id": 14, "stem": "关于信息安全的描述，不正确的是（）。", "options": {"A": "网络安全技术主要包括防火墙、入侵检测与防护、VPN、安全扫描、网络蜜罐技术、用户和实体行为分析技术", "B": "随着物联网、云计算、人工智能、大数据等新一代信息技术的广泛应用，信息安全面临着新的问题和挑战", "C": "信息安全可以划分为设备安全、数据安全、平台安全、行为安全四个层次", "D": "信息系统安全包括网络安全、操作系统安全、数据库系统安全和应用系统安全"}, "ans": "C", "exp": "信息安全可以划分为四个层次：设备安全、数据安全、内容安全、行为安全（并非“平台安全”）。故 C 错误。"}, {"id": 15, "stem": "以下原则中，不属于应用架构的是（）。", "options": {"A": "功能专业化原则", "B": "成熟度控制原则", "C": "风险最小化原则", "D": "资产复用化原则"}, "ans": "B", "exp": "应用架构包括：业务适配性原则、应用聚合化原则、功能专业化原则、风险最小化原则、资产复用化原则。B“成熟度控制原则”属于技术架构的内容。"}, {"id": 16, "stem": "（）用户想当然认为系统应具备的功能或性能，但并不能正确描述自己想要得到的这些功能或性能需求。", "options": {"A": "常规需求", "B": "期望需求", "C": "意外需求", "D": "基本需求"}, "ans": "B", "exp": "期望需求：用户想当然认为系统应具备的功能或性能，但并不能正确描述自己想要得到的这些功能或性能需求。若期望需求没有得到实现，会让用户感到不满意。"}, {"id": 17, "stem": "在 OOD 中，类可以分为 3 种类型：实体类、控制类和边界类。下列表述不正确的是（）。", "options": {"A": "实体类通常都是永久性的", "B": "实体类没有属性，但不一定有操作", "C": "控制类没有属性，但一定有方法", "D": "边界类可以既有属性也有方法"}, "ans": "B", "exp": "实体类一定有属性，但不一定有操作。B 项“实体类没有属性”表述错误。"}, {"id": 18, "stem": "虚拟现实的关键技术不包括（）。", "options": {"A": "蒙特卡洛分析技术", "B": "人机交互技术", "C": "传感器技术", "D": "动态环境建模技术"}, "ans": "A", "exp": "虚拟现实的关键技术主要涉及人机交互技术、传感器技术、动态环境建模技术和系统集成技术等。蒙特卡洛分析技术不属于。"}, {"id": 19, "stem": "两化融合是信息化和工业化的高层次的深度结合，主要在技术、产品、（）、产业四个方面进行融合。", "options": {"A": "软件", "B": "网络", "C": "硬件", "D": "业务"}, "ans": "D", "exp": "信息化与工业化主要在技术、产品、业务、产业四个方面进行融合。"}, {"id": 20, "stem": "（）主要关注大数据存储、大数据协同和安全隐私等方面。", "options": {"A": "大数据获取技术", "B": "大数据可视化技术", "C": "大数据处理技术", "D": "大数据管理技术"}, "ans": "D", "exp": "大数据管理技术主要集中在大数据存储、大数据协同和安全隐私等方面。获取技术集中在采集/整合/清洗，可视化技术集中在文本/网络/时空/多维可视化，处理技术涉及分布式计算等。"}, {"id": 21, "stem": "下列（）属于异常数据的预处理的方法。", "options": {"A": "删除缺失值", "B": "数据迁移工具", "C": "均值填补法", "D": "分箱法"}, "ans": "D", "exp": "异常数据的预处理常见方法为分箱法、回归法。"}, {"id": 22, "stem": "（）位于客户和服务器之间，完成负载平衡、失效恢复等任务，以提高系统的整体性能。", "options": {"A": "数据库访问中间件", "B": "远程过程调用中间件", "C": "分布式对象中间件", "D": "事务中间件"}, "ans": "D", "exp": "事务中间件提供支持大规模事务处理的可靠运行环境，位于客户和服务器之间，完成事务管理与协调、负载平衡、失效恢复等任务，提高系统整体性能。"}, {"id": 23, "stem": "关于数据库和数据仓库技术的描述，正确的是（）。", "options": {"A": "数据库是一个面向主题的、集成的、相对稳定的、反映历史变化的数据集合，用于支持管理决策", "B": "数据库主要采用 OLAP，数据仓库主要采用 OLTP", "C": "与数据库相比，数据仓库主要存放历史数据，相对稳定", "D": "数据仓库的结构通常包含数据源、数据集市、OLTP 和前端工具"}, "ans": "C", "exp": "A 描述的是数据仓库而非数据库；B 表述相反（数据库 OLTP、数据仓库 OLAP）；D 数据仓库结构不包括 OLTP。只有 C 正确。"}, {"id": 24, "stem": "（）负责对软件提供接口以使程序能使用网络服务。", "options": {"A": "数据链路层", "B": "传输层", "C": "会话层", "D": "应用层"}, "ans": "D", "exp": "应用层负责对软件提供接口以使程序能使用网络服务，如事务处理程序、文件传送协议和网络管理等。常见协议 HTTP、FTP、SMTP、Telnet。"}, {"id": 25, "stem": "数据质量评价过程是产生和报告数据质量结果的一系列步骤，下列选项描述了数据质量评价过程。①确定数据质量度量方法 ②选择并使用数据质量评价方法 ③确定适用的数据质量定量元素及其数据质量范围 ④确定数据质量结果 ⑤决定一致性", "options": {"A": "①②③⑤④", "B": "③①②④⑤", "C": "①④②③⑤", "D": "③①④②⑤"}, "ans": "B", "exp": "数据质量评价流程：第一步确定适用的数据质量定量元素及数据质量范围(③)，第二步确定数据质量度量方法(①)，第三步选择并使用数据质量评价方法(②)，第四步确定数据质量结果、决定一致性(④⑤)，第五步报告数据质量结果。即③①②④⑤。"}, {"id": 26, "stem": "软件过程能力成熟度模型（CSMM）包括治理、开发与交付、管理与支持、（）四个能力域。", "options": {"A": "数据管理", "B": "组织管理", "C": "战略管理", "D": "运营管理"}, "ans": "B", "exp": "CSMM 包括治理能力、开发与交付能力、管理与支持能力、组织管理能力四个能力域。"}, {"id": 27, "stem": "由安全机制、OSI 网络参考模型、安全服务三个轴形成的信息安全系统三维空间中，操作系统漏洞检测与修复属于（）。", "options": {"A": "平台安全", "B": "应用安全", "C": "通信安全", "D": "授权和审计安全"}, "ans": "A", "exp": "平台安全主要包括操作系统漏洞检测与修复、网络基础设施漏洞检测与修复、通用基础应用程序漏洞检测与修复、网络安全产品部署等。"}, {"id": 28, "stem": "关于项目集与项目组合的描述，不正确的是（）。", "options": {"A": "项目组合是为实现项目目标而组合在一起管理的项目集、子项目组合和运营工作的组合", "B": "项目集将一个大型复杂项目拆分后形成若干小项目形成的集合", "C": "项目组合经理通过项目组合的总体投资效果和实现效益来衡量项目组合的成功", "D": "项目集经理通过协调项目及子组的活动，确保项目集效益按预期实现"}, "ans": "A", "exp": "项目组合是指为实现【战略目标】（而非项目目标）而组合在一起管理的项目、项目集、子项目组合和运营工作。注意“项目目标”与“战略目标”不同。故 A 错误。"}, {"id": 29, "stem": "关于项目实施整体变更控制的描述不正确的是（）。", "options": {"A": "影响项目基准的变更应由 CCB 和客户审批", "B": "项目经理对实施变更控制过程承担最终责任", "C": "CCB 也可以审查配置管理活动，应明确规定 CCB 的角色和职责", "D": "批准的变更请求都是可用于实施整体变更控制过程的输入文件"}, "ans": "D", "exp": "批准的变更请求是实施整体变更控制过程的【输出】，而非输入文件。故 D 错误。"}, {"id": 30, "stem": "关于项目可行性研究的描述，不正确的是（）。", "options": {"A": "初步可行性研究报告必须包含项目的主要投资支出", "B": "初步的可行性研究报告可作为正式文件，支持项目决策", "C": "初步可行性研究报告的核心内容不包括项目进度安排", "D": "初步可行性研究是详细可行性研究的基础"}, "ans": "C", "exp": "初步可行性研究主要内容包括：需求与市场预测、设备与资源投入分析、空间布局、项目设计、【项目进度安排】、项目投资与成本估算。可见包含进度安排，故 C 错误。"}, {"id": 31, "stem": "迭代型与增量型项目生命周期的特点是（）。", "options": {"A": "需求在交付期间频繁细化，在交付期间实时把变更融入项目", "B": "需求在交付期间定期细化，定期把变更融入项目", "C": "需求在开发前确定，尽量限制变更", "D": "针对最终可交付成果制定可交付计划，在项目结束时一次性交付最终产品"}, "ans": "B", "exp": "迭代型与增量型：需求在交付期间定期细化，定期把变更融入项目，分次交付整体项目的各个子集。A 是适应型（敏捷）的特点，C/D 是预测型的特点。"}, {"id": 32, "stem": "项目评估指在（）的基础上，由（）根据国家颁布的政策、法规、方法、参数和条例等条件下，进行评价、分析和论证。", "options": {"A": "项目立项申请；项目承建方", "B": "项目可行性研究；项目建设方", "C": "项目立项申请；第三方", "D": "项目可行性研究；第三方"}, "ans": "D", "exp": "项目评估指在项目可行性研究的基础上，由第三方（国家、银行或有关机构）根据国家颁布的政策、法规、方法、参数和条例等，对拟建项目进行评价、分析和论证，判断其是否可行。"}, {"id": 33, "stem": "项目整合管理过程中，“实施已批准的变更”在（）过程中开展。", "options": {"A": "指导与管理项目工作", "B": "监控项目工作", "C": "制订项目管理计划", "D": "实施整体变更控制"}, "ans": "A", "exp": "指导与管理项目工作是为实现项目目标而领导和执行项目管理计划中所确定的工作，并实施已批准变更的过程。"}, {"id": 34, "stem": "描述产品、服务或成果的边界和验收标准，属于（）过程的作用。", "options": {"A": "收集需求", "B": "确认范围", "C": "规划范围管理", "D": "定义范围"}, "ans": "D", "exp": "定义范围的作用：描述产品、服务或成果的边界和验收标准。"}, {"id": 35, "stem": "关于收集需求管理过程及相关技术的描述，正确的是（）。", "options": {"A": "需求跟踪矩阵是把产品需求从其来源链接到能满足需求的可交付成果的一种表格", "B": "原型法是一种结构化的头脑风暴形式，通过投票排列最有用的创意", "C": "故事板是一种原型技术，是对产品范围的可视化描绘，可以直观显示业务系统的交互方式", "D": "收集需求管理过程为规划范围管理过程奠定基础，需要反复开展，贯穿于整个项目生命周期"}, "ans": "A", "exp": "A 正确。B 应为“名义小组技术”（结构化头脑风暴+投票排序）；C 故事板是通过一系列图像或图示展示顺序或导航路径；D 收集需求为定义范围（而非规划范围管理）奠定基础，且仅开展一次或仅在项目的预定义点开展。"}, {"id": 36, "stem": "关于干系人参与计划的描述，不正确的是（）。", "options": {"A": "干系人参与计划是项目管理计划的组成部分", "B": "干系人参与计划基于项目的需要和干系人的期望而制定", "C": "干系人参与计划是识别干系人过程的输出", "D": "干系人参与计划制订了干系人有效参与和执行项目决策的策略和行动"}, "ans": "C", "exp": "干系人参与计划是【规划干系人参与】过程的输出，不是识别干系人过程的输出。故 C 错误。"}, {"id": 37, "stem": "在执行质量管理相关过程时，质量经理对提交的成果进行了审查，将发现的问题记录并给出了纠正措施建议，该质量经理正在执行（）过程。", "options": {"A": "控制质量", "B": "管理质量", "C": "规划质量管理", "D": "持续改进"}, "ans": "A", "exp": "控制质量是为评估绩效、确保项目输出完整、正确且满足客户期望，而监督和记录质量管理活动执行结果的过程，主要作用是核实可交付成果和工作达到干系人的质量要求，可供最终验收。"}, {"id": 38, "stem": "采购步骤为（）。①准备并发布招标文件 ②确定合格卖方的名单 ③结束谈判，买方和卖方签署合同 ④对建议书开展技术（包括质量）评估 ⑤准备采购工作说明书（SOW） ⑥由卖方准备并提交建议书 ⑦发布招标广告", "options": {"A": "⑤⑦②①④⑥③", "B": "⑤⑦①⑥②④③", "C": "⑤⑦①⑥④②③", "D": "⑤⑦②①⑥④③"}, "ans": "D", "exp": "采购步骤：⑤准备采购工作说明书(SOW)→⑦发布招标广告→②确定合格卖方的名单→①准备并发布招标文件→⑥由卖方准备并提交建议书→④对建议书开展技术(含质量)评估及成本评估→③结束谈判签署合同。即⑤⑦②①⑥④③。"}, {"id": 39, "stem": "项目经理向公司管理层汇报项目进展情况时最适合采用（）。", "options": {"A": "工作绩效数据", "B": "工作绩效信息", "C": "工作绩效报告", "D": "项目管理计划"}, "ans": "C", "exp": "工作绩效报告是为制定决策、采取行动或引起关注而汇编工作绩效信息所形成的实物或电子项目文件，是可以正式提交给干系人、能全面反映项目情况的正式文件。"}, {"id": 40, "stem": "关于项目合同管理概述，不正确的（）。", "options": {"A": "经过买方认可，项目主体工作在签订分包合同时可以使用总价合同", "B": "按照项目范围划分，合同分为项目总承包合同、单项承包合同、项目分包合同", "C": "项目合同采用总价合同时，买方必须准确定义要购买的产品或服务", "D": "合同双方如签订工料合同，则买方承担中等程度的成本风险，卖方承担单价风险"}, "ans": "A", "exp": "订立项目分包合同须同时满足 5 个条件：①经买方认可；②分包部分必须是项目【非主体】工作；③只能分包部分项目而非转包整个项目；④分包方具备相应资质；⑤分包方不能再分包。故“主体工作分包”表述错误，A 错误。"}, {"id": 41, "stem": "问题解决的步骤（）。①定义问题 ②识别根本原因 ③生成可能的解决方案 ④选择最佳解决方案 ⑤执行解决方案 ⑥验证解决方案的有效性", "options": {"A": "③②①④⑤⑥", "B": "②①③④⑤⑥", "C": "①②③④⑥⑤", "D": "①②③④⑤⑥"}, "ans": "D", "exp": "问题解决步骤：定义问题→识别根本原因→生成可能的解决方案→选择最佳解决方案→执行解决方案→验证解决方案的有效性。即①②③④⑤⑥。"}, {"id": 42, "stem": "某项目经理负责一个软件开发项目，活动和依赖关系：活动 A 需求分析，耗时 2 天；活动 B 设计，依赖 A 完成，耗时 3 天；活动 C 编码，依赖 B 完成，耗时 5 天；活动 D 测试，与 C 同时开展但必须在 C 完成后才能完全结束，耗时 7 天；活动 E 部署，依赖 C 和 D 完成，耗时 2 天。项目工期为（）天。", "options": {"A": "14", "B": "12", "C": "13", "D": "19"}, "ans": "A", "exp": "关键路径为 A→B→D→E，工期 = 2+3+7+2 = 14 天。"}, {"id": 43, "stem": "对于信息系统开发项目来说，其文档一般分开发文档、产品文档和管理文档。不属于开发文档的是（）。", "options": {"A": "软件集成计划", "B": "安全和测试信息", "C": "配置管理计划", "D": "可行性研究报告"}, "ans": "C", "exp": "开发文档描述开发过程本身，包括可行性研究报告、需求/功能/设计规格说明、软件集成和测试计划、质量保证计划、安全和测试信息等。配置管理计划属于【管理文档】。"}, {"id": 44, "stem": "项目沟通管理是确保及时、正确地产生、收集、分发、（）和处理项目信息所需的过程。", "options": {"A": "存储", "B": "分析", "C": "接收", "D": "分享"}, "ans": "A", "exp": "管理沟通是确保项目信息及时且恰当地收集、生成、发布、【存储】、检索、管理、监督和最终处置的过程。"}, {"id": 45, "stem": "“监督沟通”过程采用的措施不包括（）。", "options": {"A": "整理经验教训、开展团队观察", "B": "审查问题日志、评估变更", "C": "开展客户满意度调查", "D": "识别和确定沟通需求"}, "ans": "D", "exp": "监督沟通可采取：开展客户满意度调查、整理经验教训、开展团队观察、审查问题日志和评估变更。D“识别和确定沟通需求”属于【规划沟通管理】。"}, {"id": 46, "stem": "采购文档是采购时用于达成法律协议的各种书面文书，不包括（）。", "options": {"A": "供方选择标准", "B": "资金筹措方案", "C": "采购工作说明书", "D": "招标文件"}, "ans": "B", "exp": "采购文档可包括招标文件、采购工作说明书、独立成本估算、供方选择标准。资金筹措方案不属于采购文档。"}, {"id": 47, "stem": "能够影响“制订项目管理计划”过程的组织过程资产包括（）。①组织的标准政策 ②变更控制程序 ③历史项目进度网络图 ④特定行业的项目管理知识体系 ⑤法律法规和安全标准 ⑥历史信息和经验教训知识库", "options": {"A": "①②③⑥", "B": "①③⑤⑥", "C": "①③④⑥", "D": "①②④⑤"}, "ans": "A", "exp": "影响制订项目管理计划的组织过程资产主要包括：组织的标准政策流程和程序、项目管理计划模板、变更控制程序、以往类似项目相关信息（如进度网络图、风险登记册等）、历史信息和经验教训知识库。即①②③⑥。（④⑤属于事业环境因素/外部）"}, {"id": 48, "stem": "关于识别干系人过程的描述，不正确的是（）。", "options": {"A": "干系人登记册是识别干系人过程的主要输出，记录与识别干系人的信息", "B": "变更日志、问题日志、需求文件可以作为识别干系人过程的输入", "C": "对干系人进行分类的方法，包括权力利益方格、因果图、回归分析、凸显模型等", "D": "识别干系人的主要作用是使项目团队能够建立对每个干系人或干系人群体的适度关注"}, "ans": "C", "exp": "常见干系人分类方法包括：权力/利益方格、干系人立方体、凸显模型、影响方向、优先级排序。因果图、回归分析不属于干系人分类方法。故 C 错误。"}, {"id": 49, "stem": "某信息系统建设项目中，为防范系统宕机风险，项目经理建议采购服务器时均配置冗余电源和冗余风扇。项目经理采用的风险应对策略为（）。", "options": {"A": "减轻", "B": "转移", "C": "规避", "D": "消除"}, "ans": "A", "exp": "风险减轻：设法把不利风险事件的概率或后果降低到可接受的临界值。设计时在子系统中设置冗余组件（冗余电源/风扇）可减轻原有组件故障造成的影响。"}, {"id": 50, "stem": "可用于控制进度过程的数据分析技术不包括（）。", "options": {"A": "备选方案分析", "B": "偏差分析", "C": "迭代燃尽图", "D": "趋势分析"}, "ans": "A", "exp": "控制进度过程的数据分析技术主要包括：挣值分析、迭代燃尽图、绩效审查、趋势分析、偏差分析、假设情景分析。备选方案分析不属于。"}, {"id": 51, "stem": "（）不属于排列活动顺序过程的工具与技术。", "options": {"A": "关键路径法", "B": "提前量和滞后量", "C": "紧前关系绘图法", "D": "箭线图法"}, "ans": "A", "exp": "排列活动顺序的工具与技术有：紧前关系绘图法、箭线图法、确定和整合依赖关系、提前量和滞后量、项目管理信息系统。关键路径法是【制定进度计划和进度控制】的工具。"}, {"id": 52, "stem": "项目范围说明书包括（）。①产品范围描述 ②需求跟踪矩阵 ③项目的除外责任 ④干系人登记册 ⑤可交付成果 ⑥验收标准", "options": {"A": "①②④⑥", "B": "①③⑤⑥", "C": "①②③⑤", "D": "①②⑤⑥"}, "ans": "B", "exp": "项目范围说明书内容包括：产品范围描述(①)、可交付成果(⑤)、验收标准(⑥)、项目的除外责任(③)等。需求跟踪矩阵、干系人登记册不属于。即①③⑤⑥。"}, {"id": 53, "stem": "某大型环保信息系统工程建设项目，项目发起人与项目经理一起识别出如下 3 类项目干系人：甲方信息系统管理人员、项目组主要技术人员、监理方，并准备针对他们编制干系人管理计划。对此，您的建议是（）。", "options": {"A": "重新识别干系人", "B": "编制干系人管理计划", "C": "召开干系人管理沟通会议", "D": "编制项目进度计划"}, "ans": "A", "exp": "该项目是大型项目，但识别的干系人较少，应【重新识别干系人】，保证识别的完整性和准确性。"}, {"id": 54, "stem": "在获取资源过程中，（）情况下不需要采用预分派。", "options": {"A": "项目需要采购外部资源", "B": "在竞标过程中承诺分派特定人员进行项目工作", "C": "在完成资源管理计划的前期工作之前，制定项目章程过程或其他过程已经指定了某些团队成员的工作", "D": "项目取决于特定人员的专有技能"}, "ans": "A", "exp": "预分派适用情况：①竞标过程中承诺分派特定人员；②项目取决于特定人员的专有技能；③在资源管理计划前期工作前，制定项目章程等过程已指定某些成员的工作。采购外部资源不属于预分派。"}, {"id": 55, "stem": "（）用于展示团队成员的职责分配和角色。", "options": {"A": "干系人参与度评估矩阵", "B": "责任分配矩阵", "C": "组织分解结构", "D": "工作分解结构"}, "ans": "B", "exp": "责任分配矩阵（RAM，如 RACI 矩阵）用于展示工作包/活动与项目团队成员之间的关系，显示分配给每个工作包的项目资源，用于说明职责分配和角色。"}, {"id": 56, "stem": "关于估算活动持续时间过程的工具与技术的描述，不正确的是（）。", "options": {"A": "类比估算是一种精确的估算方法，适用于项目详细信息充分、项目需求明确的情况", "B": "专家判断依赖于专家的可用性和经验，可能受到主观判断的影响", "C": "三点估算考虑了估算中的不确定性和风险，有助于界定活动持续时间的近似区间", "D": "参数估算是一种基于历史数据和项目参数，使用某种算法来计算成本或持续时间的估算技术"}, "ans": "A", "exp": "类比估算是一种【粗略】的估算方法，通常成本较低、耗时较少但准确性也较低，常在项目详细信息不足时使用。A 说“精确”、适用“信息充分”，表述错误。"}, {"id": 57, "stem": "适用于识别风险过程的数据分析技术是（）。", "options": {"A": "核查单", "B": "头脑风暴", "C": "访谈", "D": "SWOT 技术"}, "ans": "D", "exp": "适用于识别风险过程的数据分析技术包括：根本原因分析、假设条件和制约因素分析、SWOT 分析、文件分析。核查单、头脑风暴、访谈属于数据收集技术。"}, {"id": 58, "stem": "不能用于规划沟通管理过程的人际关系与团队技能是（）。", "options": {"A": "冲突管理", "B": "政策意识", "C": "文化意识", "D": "沟通风格评估"}, "ans": "A", "exp": "适用于规划沟通管理过程的人际关系与团队技能主要包括：沟通风格评估、政策意识、文化意识。冲突管理不属于。"}, {"id": 59, "stem": "工程师小王作为项目干系人之一，主动去访问项目相关知识库，这种沟通属于（）。", "options": {"A": "交互式沟通", "B": "拉式沟通", "C": "推式沟通", "D": "集中式沟通"}, "ans": "B", "exp": "拉式沟通：在信息量很大或受众很多的情况下使用，要求接收方自主地获取信息内容。主动访问知识库属于拉式沟通。"}, {"id": 60, "stem": "关于项目章程，下列说法不正确的是（）。", "options": {"A": "项目章程不能当作合同", "B": "项目章程可由项目经理编制", "C": "项目章程一旦被批准，就标志着项目的正式启动", "D": "应在规划开始之前任命项目经理"}, "ans": "B", "exp": "项目章程可由【发起人】编制，也可由项目经理与发起机构合作编制；单独表述“可由项目经理编制”不准确。B 错误。（章程获批准标志项目正式启动，且应在规划开始前任命项目经理）"}, {"id": 61, "stem": "在采用基于配置库的变更控制对软件代码进行修改过程中，请将下列活动按时间先后顺序排列（）。①将新基线存入产品库 ②从产品库中取出待修改代码 ③程序员在开发库中修改代码 ④将待修改代码从受控库中检出", "options": {"A": "①②③④", "B": "②①④③", "C": "②④③①", "D": "③①②④"}, "ans": "C", "exp": "基于配置库的变更控制：②将待升级基线从产品库取出放入受控库→④程序员将欲修改代码段从受控库检出(Check out)放入开发库→③程序员在开发库中修改代码并检入受控库→①全部完成后将新基线存入产品库。即②④③①。"}, {"id": 62, "stem": "实施采购的方法和技术不包括（）。", "options": {"A": "投标人会议", "B": "谈判", "C": "绩效报告", "D": "刊登广告"}, "ans": "C", "exp": "实施采购的工具与技术：专家判断、广告、投标人会议、数据分析（建议书评价）、人际关系与团队技能（谈判）。绩效报告不属于。"}, {"id": 63, "stem": "项目经理根据干系人的需求、期望、利益和对项目的潜在影响，制定项目干系人参与项目的方法，则该项目经理正在执行（）过程。", "options": {"A": "识别干系人", "B": "规划干系人参与", "C": "管理干系人参与", "D": "监督干系人参与"}, "ans": "B", "exp": "规划干系人参与：根据干系人的需求、期望、利益和对项目的潜在影响，制定项目干系人参与项目的方法。"}, {"id": 64, "stem": "关于制定预算的描述，不正确的是（）。", "options": {"A": "项目预算包括经批准用于执行项目的全部资金", "B": "成本基准是经过批准且按时间段分配的项目预算", "C": "制定预算过程的主要作用是确定项目所需资金", "D": "制定预算是汇总所有单个活动或工作包的估算成本，建立一个经批准的成本基准的过程"}, "ans": "C", "exp": "制定预算的主要作用是确定可以依据其来监督和控制项目绩效的成本基准；【估算成本】的主要作用才是确定项目所需资金。C 说法错误。"}, {"id": 65, "stem": "关于项目配置管理的描述不正确的是（）。", "options": {"A": "配置项负责人需要定期开展项目所有配置的审计", "B": "配置管理相关角色包括变更控制委员会、配置管理员、配置项负责人", "C": "配置经理负责管理和决策整个项目生命周期中的配置活动", "D": "建立和维护配置管理系统是配置管理员的职责之一"}, "ans": "A", "exp": "配置【审计】是配置管理员的职责。配置项负责人负责记录所负责配置项的所有变更、维护配置项之间的关系、调查审计中发现的差异、完成差异报告等。故 A 错误。"}, {"id": 66, "stem": "结束项目或阶段过程的输入是（）。", "options": {"A": "批准的产品规范", "B": "最终产品、服务或成果", "C": "项目最终报告", "D": "经验教训知识库"}, "ans": "A", "exp": "验收的可交付成果可包括批准的产品规范、交货收据和工作绩效文件，属于输入；B、C、D 都是结束项目或阶段过程的输出。"}, {"id": 67, "stem": "推荐性国家标准由（）部门制定。", "options": {"A": "国务院标准化行政主管", "B": "国务院有关行政主管部门", "C": "省、自治区、直辖市人民政府标准化行政主管部门", "D": "全国人民代表大会常务委员会"}, "ans": "A", "exp": "推荐性国家标准由国务院标准化行政主管部门制定。"}, {"id": 68, "stem": "在控制采购过程中，项目经理发现某些供应商提供的产品存在质量问题，并且这些问题可能导致项目延期。项目经理应（）。", "options": {"A": "立即终止与存在问题的供应商合作，并寻找新的供应商", "B": "自行决定采取补救措施，如增加项目预算或延长项目工期，以弥补供应商的问题", "C": "首先与供应商沟通，了解问题的原因，并尝试解决或减轻其对项目的影响", "D": "通知高层领导，并等待高层领导的决策后再采取行动"}, "ans": "C", "exp": "出现问题时应首先与供应商沟通，了解问题原因并尝试解决或减轻影响，而非立即终止、擅自补救或消极等待。"}, {"id": 69, "stem": "关于配置管理，以下描述不正确的是（）。", "options": {"A": "基线配置向开发人员开放读取的权限", "B": "交付给外部顾客的基线一般被称为发行基线", "C": "配置库可以分为工作库、主库、软件仓库", "D": "按开发任务建立相应的配置库，适用于通用软件的开发组织"}, "ans": "D", "exp": "按【配置项类型】建库适用于通用软件开发组织（继承性强、工具统一）；按【开发任务】建立配置库适用于专业软件开发组织（开发工具繁多、线性发展为主）。D 张冠李戴，错误。"}, {"id": 70, "stem": "若对配置项进行更改，配置项状态为（）。当配置项修改完毕并重新通过评审时，其状态变为（）。", "options": {"A": "修改、正式", "B": "草稿、正式", "C": "草稿、修改", "D": "正式、草稿"}, "ans": "A", "exp": "配置项刚建立时状态为“草稿”，通过评审后变为“正式”；此后若更改配置项则状态变为“修改”；当修改完毕并重新通过评审时，其状态又变为“正式”。"}, {"id": 71, "stem": "Project Communications Management consists of two parts. The first part is developing a strategy to ensure communication is effective for stakeholders. The second part is carrying out the activities necessary to implement the （）.", "options": {"A": "communication tools", "B": "communication technology", "C": "communication cost", "D": "communication strategy"}, "ans": "D", "exp": "项目沟通管理由两部分组成：一是制定策略确保沟通对干系人行之有效；二是执行必要活动以落实沟通策略（communication strategy）。"}, {"id": 72, "stem": "（） is the process of specifying the approach and identifying potential sellers.", "options": {"A": "Plan Procurement Management", "B": "Close Procurement Management", "C": "Control Procurement", "D": "Conduct Procurement"}, "ans": "A", "exp": "规划采购管理（Plan Procurement Management）是明确采购方法（specifying the approach）和识别潜在卖方（identifying potential sellers）的过程。"}, {"id": 73, "stem": "The project manager should use （） tool for the purpose to report on the work remaining for projects.", "options": {"A": "cumulative flow diagram", "B": "burndown chart", "C": "forecast estimation", "D": "earned value"}, "ans": "B", "exp": "燃尽图（burndown chart）用于追踪迭代中尚待完成的剩余工作量（work remaining）。"}, {"id": 74, "stem": "（） is the basis of information.", "options": {"A": "Data", "B": "wisdom", "C": "concepts", "D": "knowledge"}, "ans": "A", "exp": "数据（Data）是信息（information）的基础。"}, {"id": 75, "stem": "A project is a （） endeavor undertaken to create a unique product, service, or result.", "options": {"A": "static", "B": "permanent", "C": "temporary", "D": "renting"}, "ans": "C", "exp": "项目是为创造独特的产品、服务或结果而进行的【临时性】(temporary) 努力。"}], "cases": [{"id": "试题一", "score": "19 分", "title": "某市人工智能计算中心建设项目（项目评估 + 范围管理 + WBS）", "bg": "某市计划建设人工智能计算中心，作为新质生产力的重要抓手，向区域内进行智能化转型的企业提供人工智能算力。该建设项目主要进行硬件设备采购、平台软件采购、网络建设、软件开发等工作，投资额较大。\n\n项目建设向主管部门的申请报告被批准后，建设单位对技术可行性、经济可行性、运行环境可行性进行了细致的研究和分析，可行性研究报告未通过主管部门审批，原因是缺少社会效益可行性分析。\n\n建设单位修改报告后再次提交。由于项目金额较大，主管部门聘请具有相关资质的 A 设计院进一步评估项目可行性。A 设计院查阅了项目可行性研究报告、项目关键建设条件和工程的协议文件。A 设计院缺少熟悉人工智能领域的技术专家，设计院总工分析了评估依据，认为可研报告内容比较丰富，项目关键建设条件和工程协议文件比较全面，在可研报告上签署了同意，并将其发布为评估报告。\n\n项目获批后，建设单位项目经理老陈为明确项目边界，实施了如下项目范围管理过程，规定项目输出相应文档：\n· 规划范围管理 → 范围管理计划、（1）\n· 收集需求 → 需求文件、（2）\n· 定义范围 → 项目文件(更新)、（3）\n· 创建 WBS → 项目文件(更新)、（4）\n· 确认范围 → 验收的可交付成果、变更请求、项目文件(更新)、（5）\n· 控制范围 → 变更请求、项目管理计划(更新)、项目文件(更新)、（6）\n\n项目经理老陈分解项目工作，形成的完整 WBS 如图所示（1.0 人工智能计算中心建设项目；2.1 硬件采购 负责人：杨艺；2.2 网络建设 负责人：张明、陈平；2.3 软件开发 负责人：朱森、李杰；2.3 系统集成 负责人：赵雪；3.11 应用设计方案 负责人：张明、朱森、赵雪）。（WBS 图示请以原 PDF 为准）", "qs": ["【问题1】（5分）结合案例，依据项目评估工作程序，请指出 A 设计院评估过程存在的问题。", "【问题2】（6分）请补充项目范围管理各过程输出中缺失的文档。", "【问题3】（8分）请指出老陈编制的 WBS 不妥之处。"], "ref": "【问题1】A 设计院评估过程存在的问题：\n（1）未成立评估小组；\n（2）未开展详细的调查研究；\n（3）未进行实质的分析与评估；\n（4）未编写、讨论、修改评估报告；\n（5）未定稿并发布评估报告。\n\n【问题2】补充缺失文档：\n（1）需求管理计划；（2）需求跟踪矩阵；（3）范围说明书；（4）范围基准；（5）工作绩效信息；（6）工作绩效信息。\n\n【问题3】WBS 不妥之处：\n（1）WBS 必须是面向可交付成果的；\n（2）WBS 有遗漏（缺少平台软件采购）；\n（3）WBS 的底层不能支持计划和控制；\n（4）WBS 中的元素必须有人负责，而且只有一个人负责，图中出现 2 个人负责；\n（5）WBS 应控制在 4-6 层，题中的太简单；\n（6）一个工作单元只能从属于某个上层单元，避免交叉从属，图中有交叉（两个 2.3）；\n（7）WBS 应包括项目管理工作，也要包括分包出去的工作，这里没有项目管理工作；\n（8）WBS 的编制需要所有（主要）项目干系人的参与，案例中是项目经理 1 个人编写的。"}, {"id": "试题二", "score": "20 分", "title": "挣值分析计算题（工期 10 个月，预算 210 万元）", "bg": "某项目计划工期为 10 个月，预算 210 万元。第 7 个月结束时，项目经理进行了绩效评估，发现实际完成了总计划进度的 70%。项目实际数据（累计值，单位：万元）如下表：\n\n月份：1 / 2 / 3 / 4 / 5 / 6 / 7 / 8 / 9 / 10\nPV ：30 / 50 / 70 / 90 / 110 / 130 / 150 / 170 / 190 / 210\nAC ：35 / 55 / 80 / 95 / 120 / 140 / 145 / — / — / —", "qs": ["【问题1】（2分）根据项目数据表，可以确定（1）月份的实际花费最低，仅为（2）万元。", "【问题2】（7分）计算项目第 7 个月底时的 EV、CV、SV 值。", "【问题3】（5分）评估项目第 7 个月底时的绩效，并给出改进措施。", "【问题4】（6分）如果在第 7 个月结束时，找到了影响绩效的原因并纠正了项目偏差，请计算 ETC 和 EAC，并预测此种情况下项目完成时间较原计划提前？落后？不变？"], "ref": "【问题1】需要按表中的累计数据算出各月的实际花费，其中 7 月份实际花费最低，仅增加 5 万元（145-140=5）。\n\n【问题2】PV=150，AC=145，EV=210×70%=147。\nCPI=EV/AC=147/145=1.01；SPI=EV/PV=147/150=0.98；\nCV=EV-AC=147-145=2；SV=EV-PV=147-150=-3。\n\n【问题3】因为 CV>0、SV<0，所以成本节约、进度滞后。调整措施：（1）赶工，投入更多资源或增加工作时间，缩短关键活动工期；（2）快速跟进，并行施工，缩短关键路径长度；（3）使用高素质、经验更丰富的人员；（4）经甲方同意，减少活动范围或降低活动要求；（5）改进方法或技术，提高生产效率；（6）加强质量管理，及时发现问题，减少返工，缩短工期。\n\n【问题4】解法1：目前 ETC=BAC-EV=210-147=63；非典型，后续按计划进行，后面还有 210-150=60 万元需要花。\n解法2：截止 7 月底 SV=EV-PV=147-150=-3，进度滞后，后面按计划进行，故总体仍为滞后。\n（注：有单位要带单位）"}, {"id": "试题三", "score": "19 分", "title": "敏捷试点项目（资源管理 + RACI + 激励）", "bg": "某公司承接了一个软件开发项目，客户要求 4 个月交付。鉴于系统功能不多且相对独立，公司项目管理办公室评估后认为该项目可以作为敏捷方法的试点项目，并任命小张为项目经理开始组建项目团队。小张根据以往经验，从公司各研发组挑选了一些自己比较熟悉的开发和测试人员组建了项目团队。\n\n项目团队刚组建时，大家对敏捷和项目目标都充满信心。由于大家经常合作、彼此熟悉，所以在相关的任务安排上小张并未做过多干预。一个月以来，团队一直在紧张赶工，还是没能按计划完成第一个迭代周期的任务。对于延迟原因，团队成员认为项目经理没有制订好计划、团队分工不明确、任务分配不合理；部分人员认为开发难度比预期大，导致长期加班、压力太大。并且，由于采购的服务器、交换机等资源没能及时到位，导致部分研发完成的功能无法部署到客户现场进行演示确认。\n\n为解决团队分工问题，小张制订了一份 RACI 责任分配矩阵（R 执行、A 负责、C 咨询、I 知情），涉及需求调研与分析、硬件采购、系统架构与数据库设计、视觉交互设计、场景 3D 建模、数据对接采集整理入库、系统集成测试上线、项目收尾等活动，以及张工、李工、王工、刘工等人员。（RACI 表格细节请以原 PDF 为准）\n\n为解决团队成员压力过大的问题，小张制定了如下激励措施：\n措施1：为参与项目的员工购买了附加商业保险；\n措施2：工程师非工作时间值班，可领取额外值班补贴和误餐补贴；\n措施3：每季度评选出 2 位“季度服务之星”，颁发荣誉证书；\n措施4：给予团队成员参与更多项目讨论的机会，安排员工轮流分享经验等。\n为解决服务器不能及时到位的问题，小张安排开发人员王工负责与采购部对接，及时催促。服务器到位后，马上开始安装部署。", "qs": ["【问题1】（9分）结合案例，请指出小张在资源管理方面存在的问题？并指出小张在组建团队时在人员选择标准方面的不足之处？", "【问题2】（5分）小张制订的责任分配矩阵是否有问题？如果有，请指出来？", "【问题3】（5分）请简述部署的原则。"], "ref": "【问题1】小张在资源管理方面存在的问题（每条 1 分，最多 6 分，意思接近即给分）：\n①没有制定资源管理计划；\n②估算资源上有问题，实际难度比估计的要大；\n③估算资源上有问题，导致任务分配不合理、人员长期加班；\n④在获取人力资源上有问题，仅根据经验，没有从项目需求角度考虑团队成员选择要求；\n⑤建设团队有问题，团队成员压力大；\n⑥管理团队上有问题，团队分工不明确、任务分配不合理；\n⑦实物资源管理有问题，外购的服务器等没能及时到位；\n⑧责任分配矩阵有问题，有工作无人负责、有工作多于 1 人负责；\n⑨人员安排有问题，让开发人员与采购部对接不合适；\n⑩激励措施不合理，团队成员压力大是加班导致，应针对加班问题进行整改。\n\n小张在组建团队时人员选择标准方面的不足之处（每条 1 分，最多 4 分）：\n①没有考虑人员的经验是否丰富；②没有考虑人员的知识是否全面；③没有考虑人员的技能是否熟练；④没有考虑人员的态度是否良好。\n\n【问题2】有问题（1分）：\n• 需求调研与分析活动里有 2 个负责人，违反“1 项任务只能由 1 个人负责”的原则（1分）；\n• 硬件采购活动没有人负责，违反“每项任务必须有 1 人负责”的原则（1分）；\n• 视觉交互设计活动没有人负责，违反“每项任务必须有 1 人负责”的原则（1分）；\n• 系统集成、测试与上线活动多个人负责，违反“1 项任务只能由 1 个人负责”的原则（1分）。\n\n【问题3】部署的原则包括：\n1、部署包全部来自统一的存储库；2、所有环境使用相同的部署方式；3、所有环境使用相同的部署脚本；4、部署流程编排阶梯式晋级（设置多个检查点，一旦出问题可有序回滚）；5、整体部署由运维人员执行；6、仅通过流水线改变生产环境，防止配置漂移；7、不可变服务器；8、部署方式采用蓝绿部署或金丝雀部署。"}, {"id": "试题四", "score": "17 分", "title": "智慧环境综合治理平台（采购管理 + 成本控制）", "bg": "某市生态环境部门为提升环境综合治理能力、持续改善空气质量，决定建设智慧环境综合治理信息化平台。该平台包含二十个子系统，包括各方面数据监测采集系统、数据传输平台、数据综合分析平台、环境执法平台和决策支持系统等。A 公司作为总集成单位中标了该项目，委任拥有多年环保信息化工作经历的张经理担任项目经理，负责项目统筹管理工作。\n\n智慧环境综合治理平台中的油烟监测子系统包含监测设备和管理软件，实现辖区内餐饮企业的油烟排放数据监测和管理。生态环境部向张经理推荐了与该部门有过合作经历的 S 公司作为油烟监测设备提供商，张经理调研了相关案例后，与 S 公司签订了设备采购合同。\n\n综合治理平台建设基本完成后投入试运行，环境执法部门提出油烟监测系统中数据误报，监测数据的精准度也未能达到执法管理要求，要求 A 公司予以解决。同时，根据上级环境监测机构要求，要求张经理提高系统中油烟监测的频率，并增加基于监测数据的分析和报警功能。张经理考虑后，因为工作量不大，便联系 S 公司修改设备监测频率，同时通知本公司软件研发团队开发新功能。不久，S 公司回复其提供的监测设备不支持批量修改监测频率，只能逐个更换控制单元，工作量大且更换成本高。A 公司和 S 公司发生了纠纷，均不愿意承担变更引发的成本。同时，张经理发现软件研发团队对新功能研发的工作量也远超预期，而且由于增加了新功能还引发了新的缺陷，项目面临成本超支的风险。", "qs": ["【问题1】（6分）结合案例，请指出张经理在采购管理方面存在的不足？", "【问题2】（6分）请写出成本控制的目标？", "【问题3】（5分）结合案例，判断下列说法的正误（正确的打“√”，错误的打“×”）：（1）识别潜在卖方属于实施采购过程的活动；（2）索赔管理属于控制采购过程的工具和技术；（3）规划采购管理活动的最后成果是签订的合同；（4）在控制采购过程中，合同管理的一个重要方面就是管理各个供应商之间的沟通；（5）控制采购的质量，包括采购审计的独立性和可信度，是采购系统可靠性的关键决定因素。"], "ref": "【问题1】采购管理方面存在的不足：\n（1）没进行规划采购工作；（2）没做好实施采购工作；（3）没做好控制采购工作；（4）供应商选择有问题，不能只根据生态环境部门的推荐；（5）外购分析不全面，缺少详细分析，导致修改监测频率时无法做到批量修改；（6）没对供应商进行综合评估，仅仅只是调研了相关案例便签订了合同；（7）合同中没有相应的除外责任，导致出现变更时发生纠纷；（8）与供应商的谈判不力，导致发生纠纷；（9）控制采购不力，在没有和供应商达成一致意见前就开始了新功能的开发；（10）合同内容不完善；（11）合同变更没达成共识；（12）没有严格走变更控制流程。（答案仅供参考）\n\n【问题2】项目成本控制的目标包括：\n①对造成成本基准变更的因素施加影响；②确保所有变更请求都得到及时处理；③当变更实际发生时，管理这些变更；④确保成本支出不超过批准的资金限额（不超出按时段、WBS 组件和活动分配的限额，也不超出项目总限额）；⑤监督成本绩效，找出并分析与成本基准间的偏差；⑥对照资金支出，监督工作绩效；⑦防止在成本或资源使用报告中出现未经批准的变更；⑧向干系人报告所有经批准的变更及其相关成本；⑨设法把预期的成本超支控制在可接受的范围内等。\n\n【问题3】判断题答案：（1）×；（2）√；（3）×；（4）√；（5）√。\n【说明】识别潜在卖方属于规划采购管理过程的活动，而非实施采购；规划采购管理活动的最后成果是采购管理计划（签订/获取合同属于实施采购）。"}]};
+const MCQ = DATA.mcq, CASES = DATA.cases;
+const TOTAL = MCQ.length;
+const DURATION = 120 * 60; // seconds
+const PASS = 45;
+const K = "zx_exam_v2", KC = "zx_cases_v2";
+
+// ---- storage helpers (localStorage with in-memory fallback) ----
+let MEM = {};
+function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){ MEM[k]=JSON.stringify(v);} }
+function load(k){ try{ const s=localStorage.getItem(k); return s?JSON.parse(s):(MEM[k]?JSON.parse(MEM[k]):null);}catch(e){ return MEM[k]?JSON.parse(MEM[k]):null; } }
+
+// ---- exam state ----
+let S = load(K) || {answers:{}, cur:0, remaining:DURATION, mode:"idle"}; // mode idle|taking|result
+let tickId=null;
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active', el.dataset.tab===t));
+  document.getElementById('tab-exam').classList.toggle('hidden', t!=='exam');
+  document.getElementById('tab-case').classList.toggle('hidden', t!=='case');
+}
+
+function fmt(sec){ sec=Math.max(0,Math.floor(sec)); const m=Math.floor(sec/60), s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
+
+function refreshResume(){
+  const has = S.mode==="taking" || Object.keys(S.answers).length>0 && S.mode!=="result";
+  document.getElementById('resumeBtn').classList.toggle('hidden', !(S.mode==="taking"));
+}
+
+function startExam(){
+  S = {answers:{}, cur:0, remaining:DURATION, mode:"taking"};
+  save(K,S); renderExamShell(); startTick();
+}
+function resumeExam(){ renderExamShell(); startTick(); }
+
+function startTick(){
+  stopTick();
+  tickId = setInterval(()=>{
+    if(S.mode!=="taking") return;
+    S.remaining--; if(S.remaining<=0){ S.remaining=0; save(K,S); updateClock(); autoSubmit(); return; }
+    save(K,S); updateClock();
+  },1000);
+}
+function stopTick(){ if(tickId){ clearInterval(tickId); tickId=null; } }
+
+function renderExamShell(){
+  document.getElementById('startCard').classList.add('hidden');
+  document.getElementById('resultArea').classList.add('hidden');
+  document.getElementById('examArea').classList.remove('hidden');
+  updateClock(); renderPalette(); renderQuestion();
+}
+
+function updateClock(){
+  document.getElementById('clock').textContent = fmt(S.remaining);
+  const t=document.getElementById('timer');
+  t.classList.toggle('low', S.remaining<=5*60);
+  const done=Object.keys(S.answers).length;
+  document.getElementById('answerCount').textContent = '已答 '+done+' / '+TOTAL;
+  document.getElementById('pbar').style.width = (done/TOTAL*100)+'%';
+}
+
+function renderQuestion(){
+  const q = MCQ[S.cur];
+  const sel = S.answers[q.id];
+  let html = '<span class="qnum">第 '+q.id+' 题 / 共 '+TOTAL+' 题</span>';
+  html += '<div class="stem">'+esc(q.stem)+'</div><div class="opts">';
+  for(const k of ["A","B","C","D"]){
+    const c = (sel===k)?' sel':'';
+    html += '<div class="opt'+c+'" onclick="pick('+q.id+',\''+k+'\')"><span class="key">'+k+'</span><span class="txt">'+esc(q.options[k])+'</span></div>';
+  }
+  html += '</div>';
+  document.getElementById('qBox').innerHTML = html;
+  document.getElementById('posText').textContent = (S.cur+1)+' / '+TOTAL;
+  renderPalette();
+}
+
+function pick(id,k){
+  S.answers[id]=k; save(K,S);
+  renderQuestion(); updateClock();
+  // auto-advance for flow (keep selection visible by not advancing past current)
+}
+
+function go(d){
+  const n=S.cur+d; if(n<0||n>=TOTAL) return;
+  S.cur=n; save(K,S); renderQuestion();
+}
+
+function jump(i){ S.cur=i; save(K,S); renderQuestion(); }
+
+function renderPalette(){
+  const p=document.getElementById('palette'); if(!p) return;
+  let h='';
+  for(let i=0;i<TOTAL;i++){
+    const q=MCQ[i]; const done=S.answers[q.id]?' done':''; const cur=S.cur===i?' cur':'';
+    h+='<div class="cell'+done+cur+'" onclick="jump('+i+')">'+q.id+'</div>';
+  }
+  p.innerHTML=h;
+}
+function togglePalette(){
+  const w=document.getElementById('palWrap'); const b=document.getElementById('palBtn');
+  const hide=w.classList.toggle('hidden'); b.textContent=hide?'展开':'收起';
+}
+
+function autoSubmit(){ stopTick(); S.mode="result"; save(K,S); renderResults(); }
+
+function trySubmit(){
+  const unanswered = TOTAL - Object.keys(S.answers).length;
+  const msg = unanswered>0 ? ('还有 '+unanswered+' 题未作答，确定要交卷吗？') : '确认交卷并核对答案？';
+  if(confirm(msg)){ stopTick(); S.mode="result"; save(K,S); renderResults(); }
+}
+
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderResults(){
+  document.getElementById('startCard').classList.add('hidden');
+  document.getElementById('examArea').classList.add('hidden');
+  const area=document.getElementById('resultArea'); area.classList.remove('hidden');
+  let right=0, wrong=0, skip=0; const wrongList=[], rightList=[];
+  MCQ.forEach(q=>{
+    const a=S.answers[q.id];
+    if(!a){ skip++; wrongList.push({q,mine:null}); }
+    else if(a===q.ans){ right++; rightList.push(q); }
+    else { wrong++; wrongList.push({q,mine:a}); }
+  });
+  const score=right, pct=Math.round(right/TOTAL*100);
+  const used=DURATION - S.remaining;
+  const passed = score>=PASS;
+  let h='';
+  h+='<div class="card"><div class="scorewrap"><div>';
+  h+='<div class="scorebig">'+score+'<small> / '+TOTAL+'</small></div><div class="muted">正确率 '+pct+'%</div></div>';
+  h+='<div style="flex:1;min-width:220px"><span class="passbadge '+(passed?'pass':'fail')+'">'+(passed?'及格':'未及格')+'</span>';
+  h+='<p class="muted" style="margin:10px 0 0">及格线 '+PASS+' 分（满分 75）。用时 '+fmt(used)+'（限时 120:00）。</p>';
+  h+='<div class="statgrid">';
+  h+='<div class="stat ok"><b>'+right+'</b>答对</div>';
+  h+='<div class="stat bad"><b>'+wrong+'</b>答错</div>';
+  h+='<div class="stat skip"><b>'+skip+'</b>未答</div>';
+  h+='</div></div></div>';
+  h+='<div class="rowbtns"><button class="btn" onclick="switchTab(\'case\')">去案例分析自评</button>';
+  h+='<button class="btn ghost" onclick="retake()">重新作答</button></div></div>';
+
+  // review section
+  h+='<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px">';
+  h+='<h3 style="margin:0;font-size:18px">答题解析</h3>';
+  h+='<div><label class="muted" style="margin-right:14px"><input type="checkbox" id="onlyWrong" checked onchange="drawReview()"> 只看错题 / 未答</label>';
+  h+='<label class="muted"><input type="checkbox" id="onlyExp" onchange="drawReview()"> 仅显示解析</label></div></div>';
+  h+='<div id="reviewList"></div></div>';
+  area.innerHTML=h;
+  drawReview();
+}
+
+function drawReview(){
+  const onlyWrong=document.getElementById('onlyWrong').checked;
+  const onlyExp=document.getElementById('onlyExp').checked;
+  const box=document.getElementById('reviewList');
+  let h='';
+  MCQ.forEach(q=>{
+    const mine=S.answers[q.id];
+    const isRight = mine===q.ans;
+    const isWrong = mine && mine!==q.ans;
+    const isSkip = !mine;
+    if(onlyWrong && isRight) return;
+    let badge = isRight?'<span class="badge right">正确</span>' : (isSkip?'<span class="badge skip">未答</span>':'<span class="badge wrong">错误</span>');
+    h+='<div class="review"><div class="rh"><span class="qnum" style="margin:0">第 '+q.id+' 题</span>'+badge+'<span class="muted">正确答案：'+q.ans+(isSkip?'':(isRight?'':' · 你选：'+mine))+'</span></div>';
+    if(!onlyExp){
+      h+='<div class="stem" style="font-size:15.5px;margin-bottom:12px">'+esc(q.stem)+'</div><div class="opts">';
+      for(const k of ["A","B","C","D"]){
+        let cls='', tag='';
+        if(k===q.ans){ cls=' correct'; tag='<span class="tag c">正确</span>'; }
+        else if(k===mine && k!==q.ans){ cls=' wrong'; tag='<span class="tag w">你的选择</span>'; }
+        h+='<div class="opt'+cls+'" style="cursor:default"><span class="key">'+k+'</span><span class="txt">'+esc(q.options[k])+'</span>'+tag+'</div>';
+      }
+      h+='</div>';
+    }
+    h+='<div class="exp"><span class="ansline">【答案】'+q.ans+'</span><b>【解析】</b>'+esc(q.exp)+'</div>';
+    h+='</div>';
+  });
+  box.innerHTML = h || '<p class="muted">没有需要查看的题目，全部答对！🎉</p>';
+}
+
+function retake(){
+  if(!confirm('清空本次作答并重新开始考试？')) return;
+  S={answers:{}, cur:0, remaining:DURATION, mode:"taking"}; save(K,S);
+  renderExamShell(); startTick();
+  document.getElementById('resultArea').classList.add('hidden');
+}
+
+// ---- case module ----
+function renderCases(){
+  const list=document.getElementById('caseList'); let h='';
+  CASES.forEach((c,idx)=>{
+    const note=(load(KC)||{})[idx]||'';
+    h+='<details class="case" '+(idx===0?'open':'')+'><summary><span class="cid">'+c.id+'</span>'+esc(c.title)+'<span class="cscore">'+c.score+'</span></summary>';
+    h+='<div class="cbody"><div class="bg">'+esc(c.bg)+'</div>';
+    h+='<ul class="qs">'+c.qs.map(q=>'<li>'+esc(q)+'</li>').join('')+'</ul>';
+    h+='<div class="rowbtns"><button class="btn ghost" onclick="toggleRef(this,'+idx+')">显示参考答案</button></div>';
+    h+='<div class="refblock" id="ref'+idx+'">'+esc(c.ref)+'</div>';
+    h+='<h4 style="margin:18px 0 0;font-size:15px">我的作答（草稿，自动保存）</h4>';
+    h+='<textarea class="myans" placeholder="在此写下你的答案，再展开参考答案逐条对照..." oninput="saveCaseNote('+idx+',this.value)">'+esc(note)+'</textarea>';
+    h+='</div></details>';
+  });
+  list.innerHTML=h;
+}
+function toggleRef(btn,idx){
+  const r=document.getElementById('ref'+idx); const show=r.classList.toggle('show');
+  btn.textContent = show?'隐藏参考答案':'显示参考答案';
+}
+function saveCaseNote(idx,v){ const m=load(KC)||{}; m[idx]=v; save(KC,m); }
+
+// ---- boot ----
+window.addEventListener('beforeunload',()=>{ if(tickId) save(K,S); });
+(function boot(){
+  refreshResume();
+  if(S.mode==="result"){ renderExamShell(); renderResults(); }
+  else if(S.mode==="taking"){ startTick(); renderExamShell(); }
+  else { refreshResume(); }
+  renderCases();
+})();
+</script>
+</body>
+</html>
